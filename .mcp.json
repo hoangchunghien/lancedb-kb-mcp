@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "lance-kb": {
+      "command": "uv",
+      "args": ["run", "lancedb-kb-mcp"],
+      "env": { "LANCE_KB_DIR": "kb-data" }
+    }
+  }
+}
