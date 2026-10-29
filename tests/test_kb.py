@@ -52,3 +52,12 @@ def test_versions_time_travel_and_restore(kb):
     assert kb.search("durable", mode="text", version=before)[0]["id"] == a
     kb.restore(before)
     assert kb.get(a)["title"] == "Keep"
+
+
+def test_rst_headings_split_chunks():
+    from lancedb_kb_mcp.chunking import chunk_text
+
+    text = "Intro\n=====\n\nhello\n\nCheck argument types [arg-type]\n-------------------------------\n\nbody\n"
+    chunks = list(chunk_text(text))
+    assert [c[0] for c in chunks] == ["Intro", "Check argument types [arg-type]"]
+    assert chunks[1][2] == 6

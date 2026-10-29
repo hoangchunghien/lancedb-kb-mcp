@@ -44,8 +44,11 @@ uv run lance-kb search "E1042"
 The first run downloads the embedding model (about 130 MB) into the Hugging Face cache. After
 that, ingesting the three sample files takes a few seconds.
 
-Notice that the first query shares no keywords with the runbook it finds, and the second is an
-error code that a vector search alone tends to miss. Hybrid search handles both.
+The first query shares no keywords with the runbook it finds; the second is an exact error code.
+Three files are too few to show the difference between the modes. On mypy's documentation (37
+files, 662 chunks), searching for each of its 78 error codes on its own put the right section
+first 61 times with vector search, 62 with keyword search and 69 with hybrid search. Try
+`--mode vector` and `--mode text` on your own docs to see where they differ.
 
 ## Use it from Claude Code
 
