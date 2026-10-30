@@ -132,3 +132,11 @@ def test_images_are_found_by_text_and_merged(kb, tmp_path):
     assert kb.ingest_folder(str(docs)) == {"indexed": 0, "skipped": 2}
     kb.delete(image["id"])
     assert kb.get(image["id"]) is None
+
+
+def test_quoted_query_is_a_phrase_search(kb):
+    kb.add_note("Backlog", "The queue backlog alert fires after ten minutes.")
+    kb.add_note("Other", "The backlog of the queue is long.")
+    hits = kb.search('"queue backlog"', mode="text")
+    assert [h["title"] for h in hits] == ["Backlog"]
+    assert kb.search('what does "queue backlog" mean')  # hybrid search with quotes

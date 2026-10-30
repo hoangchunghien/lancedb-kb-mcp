@@ -1,0 +1,25 @@
+{
+  "first_stage": "bge-small-en-v1.5 hybrid, top 50",
+  "candidates": 50,
+  "none": {
+    "scifact_ndcg10": 0.7231,
+    "vidore_hit1": 0.7424,
+    "vidore_hit5": 0.9545
+  },
+  "rerankers": [
+    {
+      "model": "cross-encoder/ms-marco-MiniLM-L6-v2",
+      "scifact_ndcg10": 0.6959,
+      "vidore_hit1": 0.7576,
+      "vidore_hit5": 0.9242,
+      "cpu_ms_per_question": 1219
+    },
+    {
+      "model": "BAAI/bge-reranker-base",
+      "scifact_ndcg10": 0.721,
+      "vidore_hit1": 0.7197,
+      "vidore_hit5": 0.9394,
+      "cpu_ms_per_question": 8151
+    }
+  ]
+}

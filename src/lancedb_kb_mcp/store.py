@@ -154,7 +154,10 @@ class KnowledgeBase:
 
     def _reindex(self):
         if self.table.count_rows():
-            self.table.create_index("text", config=FTS(), replace=True)
+            # Positions let quoted text run as a phrase query instead of raising.
+            self.table.create_index(
+                "text", config=FTS(with_position=True), replace=True
+            )
 
     def add_note(self, title, text, project="default", tags=()):
         now = _now()
