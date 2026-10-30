@@ -1,0 +1,317 @@
+{
+  "text": [
+    {
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "params_m": 23,
+      "dim": 384,
+      "scifact_ingest_s": 3.9,
+      "scifact": {
+        "vector": {
+          "ndcg10": 0.6451,
+          "recall10": 0.7833
+        },
+        "hybrid": {
+          "ndcg10": 0.7067,
+          "recall10": 0.8343
+        }
+      },
+      "vidore": {
+        "vector": {
+          "ndcg10": 0.5514,
+          "hit1": 0.6061,
+          "hit5": 0.8864
+        },
+        "hybrid": {
+          "ndcg10": 0.6632,
+          "hit1": 0.7348,
+          "hit5": 0.9318
+        }
+      },
+      "cpu_query_ms": 4.3
+    },
+    {
+      "model": "BAAI/bge-small-en-v1.5",
+      "params_m": 33,
+      "dim": 384,
+      "scifact_ingest_s": 10.9,
+      "scifact": {
+        "vector": {
+          "ndcg10": 0.7127,
+          "recall10": 0.8362
+        },
+        "hybrid": {
+          "ndcg10": 0.7223,
+          "recall10": 0.8462
+        }
+      },
+      "vidore": {
+        "vector": {
+          "ndcg10": 0.6062,
+          "hit1": 0.7045,
+          "hit5": 0.8939
+        },
+        "hybrid": {
+          "ndcg10": 0.6804,
+          "hit1": 0.7424,
+          "hit5": 0.9545
+        }
+      },
+      "cpu_query_ms": 5.9
+    },
+    {
+      "model": "Snowflake/snowflake-arctic-embed-s",
+      "params_m": 33,
+      "dim": 384,
+      "scifact_ingest_s": 11.0,
+      "scifact": {
+        "vector": {
+          "ndcg10": 0.6992,
+          "recall10": 0.8229
+        },
+        "hybrid": {
+          "ndcg10": 0.7295,
+          "recall10": 0.8499
+        }
+      },
+      "vidore": {
+        "vector": {
+          "ndcg10": 0.6066,
+          "hit1": 0.7045,
+          "hit5": 0.9167
+        },
+        "hybrid": {
+          "ndcg10": 0.6826,
+          "hit1": 0.75,
+          "hit5": 0.9545
+        }
+      },
+      "cpu_query_ms": 8.5
+    },
+    {
+      "model": "intfloat/e5-small-v2",
+      "params_m": 33,
+      "dim": 384,
+      "scifact_ingest_s": 11.0,
+      "scifact": {
+        "vector": {
+          "ndcg10": 0.6875,
+          "recall10": 0.8057
+        },
+        "hybrid": {
+          "ndcg10": 0.7202,
+          "recall10": 0.8339
+        }
+      },
+      "vidore": {
+        "vector": {
+          "ndcg10": 0.6027,
+          "hit1": 0.6894,
+          "hit5": 0.9167
+        },
+        "hybrid": {
+          "ndcg10": 0.6768,
+          "hit1": 0.7424,
+          "hit5": 0.9545
+        }
+      },
+      "cpu_query_ms": 8.0
+    },
+    {
+      "model": "BAAI/bge-base-en-v1.5",
+      "params_m": 109,
+      "dim": 768,
+      "scifact_ingest_s": 26.4,
+      "scifact": {
+        "vector": {
+          "ndcg10": 0.7404,
+          "recall10": 0.8742
+        },
+        "hybrid": {
+          "ndcg10": 0.7523,
+          "recall10": 0.8712
+        }
+      },
+      "vidore": {
+        "vector": {
+          "ndcg10": 0.633,
+          "hit1": 0.6894,
+          "hit5": 0.9091
+        },
+        "hybrid": {
+          "ndcg10": 0.6936,
+          "hit1": 0.7273,
+          "hit5": 0.9621
+        }
+      },
+      "cpu_query_ms": 15.8
+    },
+    {
+      "model": "intfloat/multilingual-e5-small",
+      "params_m": 118,
+      "dim": 384,
+      "scifact_ingest_s": 11.4,
+      "scifact": {
+        "vector": {
+          "ndcg10": 0.677,
+          "recall10": 0.8066
+        },
+        "hybrid": {
+          "ndcg10": 0.7126,
+          "recall10": 0.8399
+        }
+      },
+      "vidore": {
+        "vector": {
+          "ndcg10": 0.5572,
+          "hit1": 0.6212,
+          "hit5": 0.8864
+        },
+        "hybrid": {
+          "ndcg10": 0.6809,
+          "hit1": 0.7727,
+          "hit5": 0.947
+        }
+      },
+      "cpu_query_ms": 8.1
+    },
+    {
+      "model": "mixedbread-ai/mxbai-embed-large-v1",
+      "params_m": 335,
+      "dim": 1024,
+      "scifact_ingest_s": 25.2,
+      "scifact": {
+        "vector": {
+          "ndcg10": 0.739,
+          "recall10": 0.8716
+        },
+        "hybrid": {
+          "ndcg10": 0.7473,
+          "recall10": 0.8669
+        }
+      },
+      "vidore": {
+        "vector": {
+          "ndcg10": 0.6569,
+          "hit1": 0.7197,
+          "hit5": 0.9621
+        },
+        "hybrid": {
+          "ndcg10": 0.7003,
+          "hit1": 0.7424,
+          "hit5": 0.9621
+        }
+      },
+      "cpu_query_ms": 47.9
+    },
+    {
+      "model": "Qwen/Qwen3-Embedding-0.6B",
+      "params_m": 596,
+      "dim": 1024,
+      "scifact_ingest_s": 70.3,
+      "scifact": {
+        "vector": {
+          "ndcg10": 0.6998,
+          "recall10": 0.8272
+        },
+        "hybrid": {
+          "ndcg10": 0.7347,
+          "recall10": 0.8552
+        }
+      },
+      "vidore": {
+        "vector": {
+          "ndcg10": 0.6697,
+          "hit1": 0.7576,
+          "hit5": 0.9545
+        },
+        "hybrid": {
+          "ndcg10": 0.7054,
+          "hit1": 0.7576,
+          "hit5": 0.9545
+        }
+      },
+      "cpu_query_ms": 92.3
+    },
+    {
+      "model": "Qwen3-Embedding-8B (Q6_K, llama.cpp, 1536 dims)",
+      "params_m": 8000,
+      "dim": 1536,
+      "scifact_ingest_s": 479.6,
+      "scifact": {
+        "vector": {
+          "ndcg10": 0.796,
+          "recall10": 0.9122
+        },
+        "hybrid": {
+          "ndcg10": 0.7748,
+          "recall10": 0.9064
+        }
+      },
+      "vidore": {
+        "vector": {
+          "ndcg10": 0.7443,
+          "hit1": 0.8485,
+          "hit5": 0.9848
+        },
+        "hybrid": {
+          "ndcg10": 0.7447,
+          "hit1": 0.8182,
+          "hit5": 0.9773
+        }
+      },
+      "gpu_server_query_ms": 23.6
+    }
+  ],
+  "image": [
+    {
+      "model": "clip-ViT-B-32",
+      "params_m": 151,
+      "dim": 512,
+      "ingest_s": 39.0,
+      "recall1": 0.5936,
+      "recall5": 0.8452,
+      "recall10": 0.9022,
+      "cpu_query_ms": 6.8
+    },
+    {
+      "model": "clip-ViT-B-16",
+      "params_m": 150,
+      "dim": 512,
+      "ingest_s": 32.7,
+      "recall1": 0.6238,
+      "recall5": 0.8582,
+      "recall10": 0.9194,
+      "cpu_query_ms": 9.8
+    },
+    {
+      "model": "clip-ViT-L-14",
+      "params_m": 428,
+      "dim": 768,
+      "ingest_s": 45.9,
+      "recall1": 0.6506,
+      "recall5": 0.8736,
+      "recall10": 0.9268,
+      "cpu_query_ms": 11.3
+    }
+  ],
+  "keyword": {
+    "scifact": {
+      "ndcg10": 0.676,
+      "recall10": 0.8037
+    },
+    "vidore": {
+      "ndcg10": 0.6667,
+      "hit1": 0.6894,
+      "hit5": 0.9318
+    },
+    "search_ms": 3.8,
+    "hybrid_search_ms": 6.0
+  },
+  "skipped": [
+    {
+      "model": "nomic-ai/nomic-embed-text-v1.5",
+      "error": "AttributeError: 'NomicBertModel' object has no attribute 'get_extended_attention_mask'"
+    }
+  ],
+  "device": "NVIDIA GeForce RTX 4070 SUPER"
+}

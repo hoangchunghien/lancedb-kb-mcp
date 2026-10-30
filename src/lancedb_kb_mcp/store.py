@@ -337,12 +337,13 @@ class KnowledgeBase:
             filters.append(f"kind = {_sql(kind)}")
         if tag:
             filters.append(f"array_has(tags, {_sql(tag)})")
-        vector = self.embedder.encode([query], query=True)[0]
-        if mode == "vector":
-            q = table.search(vector).distance_type("cosine")
-        elif mode == "text":
+        if mode == "text":  # keyword search needs no embedding
             q = table.search(query, query_type="fts")
+        elif mode == "vector":
+            vector = self.embedder.encode([query], query=True)[0]
+            q = table.search(vector).distance_type("cosine")
         else:
+            vector = self.embedder.encode([query], query=True)[0]
             q = (
                 table.search(query_type="hybrid")
                 .vector(vector)

@@ -5,3 +5,5 @@ __pycache__/
 .ruff_cache/
 kb-data/
 bench/.cache/
+bench/results/*.light.png
+bench/results/*.dark.png

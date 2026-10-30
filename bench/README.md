@@ -81,3 +81,41 @@ about them. Measured both ways:
 So the cut-off is a trade-off rather than a clean line. CLIP scores for matching and
 unrelated pairs overlap. Raise it if unrelated photos bother you, lower it if photos go
 missing.
+
+## Which local model?
+
+`models.py` runs the text benchmarks (SciFact, ViDoRe PDF) across embedding models and the
+image benchmark across CLIP sizes, and `charts.py` draws the charts below from
+`results/models.json`.
+
+```bash
+uv run python models.py                                          # all models; resumes if stopped
+LIVE_EMBED_URL=http://127.0.0.1:8081 uv run python models.py     # also a llama.cpp server's model
+uv run python charts.py
+```
+
+How it is run, so the numbers compare fairly:
+
+- Each model uses the query and document prompts from its model card (e5: `query:` and
+  `passage:`, bge and arctic: the "Represent this sentence" query prefix, Qwen3: its query
+  instruction, MiniLM: none).
+- Inputs are capped at 512 tokens, the limit most of these models already have.
+- Quality is measured on the GPU; speed is measured on the CPU in float32, one question at a
+  time, which is how a laptop would run it. The time per question is the embedding plus the
+  search.
+- Qwen3-Embedding-8B is too big for a laptop. It was measured through a llama.cpp server
+  (Q6_K GGUF, last-token pooling, output cut to 1536 dimensions), so its time is a GPU time.
+- nomic-embed-text-v1.5 is left out: its custom model code does not run on current
+  `transformers`.
+
+![Text search quality vs model size](results/models-scifact.svg)
+
+Keyword search alone scores 0.676. Hybrid search lifts every small model and narrows their
+spread from 0.645 to 0.740 down to 0.707 to 0.752. Qwen3-Embedding-8B reaches 0.796 with vector
+search alone, and is the one model that keyword search makes worse (0.775 hybrid).
+
+![Finding the right PDF page](results/models-vidore.svg)
+
+![Time per question on a CPU](results/models-cpu.svg)
+
+![Finding a photo from a sentence](results/models-clip.svg)

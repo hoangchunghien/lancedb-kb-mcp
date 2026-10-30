@@ -23,9 +23,16 @@ from pathlib import Path
 
 DEFAULT_MODEL = "BAAI/bge-small-en-v1.5"
 DEFAULT_IMAGE_MODEL = "clip-ViT-B-32"
-# bge models retrieve better when the query, not the document, carries this prefix.
-QUERY_PREFIXES = {
-    "BAAI/bge-small-en-v1.5": "Represent this sentence for searching relevant passages: "
+# (query prefix, document prefix) from each model card, for models whose config does not
+# carry its own prompts. Models that do (Snowflake arctic-embed, mxbai, Qwen3-Embedding)
+# use theirs.
+_BGE = "Represent this sentence for searching relevant passages: "
+PREFIXES = {
+    "BAAI/bge-small-en-v1.5": (_BGE, ""),
+    "BAAI/bge-base-en-v1.5": (_BGE, ""),
+    "intfloat/e5-small-v2": ("query: ", "passage: "),
+    "intfloat/multilingual-e5-small": ("query: ", "passage: "),
+    "nomic-ai/nomic-embed-text-v1.5": ("search_query: ", "search_document: "),
 }
 
 
@@ -68,15 +75,25 @@ class SentenceTransformerEmbedder:
         for logger in ("httpx", "httpx2", "huggingface_hub", "sentence_transformers"):
             logging.getLogger(logger).setLevel(logging.WARNING)
         self.name = name
+        device = os.environ.get("LANCE_KB_DEVICE") or None
+        # Some models default to half precision, which is slow on a CPU.
+        kwargs = {"model_kwargs": {"dtype": "float32"}} if device == "cpu" else {}
         self.model = SentenceTransformer(
-            name, device=os.environ.get("LANCE_KB_DEVICE") or None
+            name,
+            device=device,
+            trust_remote_code=name.startswith("nomic-ai/"),
+            **kwargs,
         )
         self.dim = self.model.get_embedding_dimension()
-        self.prefix = QUERY_PREFIXES.get(name, "")
+        prompts = self.model.prompts or {}
+        self.prefix, self.doc_prefix = PREFIXES.get(
+            name, (prompts.get("query", ""), prompts.get("document", ""))
+        )
 
     def encode(self, texts, query=False):
-        if query and self.prefix:
-            texts = [self.prefix + t for t in texts]
+        prefix = self.prefix if query else self.doc_prefix
+        if prefix:
+            texts = [prefix + t for t in texts]
         return self.model.encode(
             list(texts), normalize_embeddings=True, show_progress_bar=False
         ).tolist()

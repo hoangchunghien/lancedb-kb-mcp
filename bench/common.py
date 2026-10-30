@@ -37,9 +37,9 @@ def mean(xs):
 
 
 @contextmanager
-def fresh_kb():
+def fresh_kb(embedder=None):
     with tempfile.TemporaryDirectory() as d:
-        yield KnowledgeBase(os.path.join(d, "kb"))
+        yield KnowledgeBase(os.path.join(d, "kb"), embedder=embedder)
 
 
 def add_texts(kb, docs, batch=256):

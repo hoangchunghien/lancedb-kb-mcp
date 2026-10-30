@@ -9,6 +9,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "einops>=0.8.2",
     "lancedb>=0.41.0",
     "mcp[cli]>=2.3.0",
     "pandas>=3.1.0",
@@ -29,6 +30,7 @@ build-backend = "uv_build"
 [dependency-groups]
 bench = [
     "datasets>=5.1.0",
+    "httpx>=0.28.1",
 ]
 dev = [
     "pytest>=9.2.0",
