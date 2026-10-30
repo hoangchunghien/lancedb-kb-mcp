@@ -32,9 +32,12 @@ def search(
     version: int | None = None,
     mode: str = "hybrid",
 ) -> list[dict]:
-    """Search notes and document chunks. mode is "hybrid" (vector + keyword, merged with RRF),
-    "vector" or "text". Filter by project, kind ("note" or "chunk") or tag. Pass version to
-    search the knowledge base as it was at that version (see list_versions)."""
+    """Search notes, document chunks (Markdown, text, PDF pages) and images. mode is "hybrid"
+    (vector + keyword, merged with RRF), "vector" or "text". Filter by project, kind ("note",
+    "chunk" or "image") or tag. Images are matched by what they look like, so describe the
+    picture ("architecture diagram", "chart of queue depth"); open an image result's source
+    file to see it. PDF chunks carry their page number. Pass version to search the notes and
+    chunks as they were at that version (see list_versions)."""
     return kb().search(
         query, k=k, project=project, kind=kind, tag=tag, version=version, mode=mode
     )
@@ -43,7 +46,7 @@ def search(
 @mcp.tool()
 def get(item_id: str) -> dict | None:
     """Fetch one note or chunk by id, with its full text and metadata."""
-    item = kb().get(item_id)
+    item = kb().get(item_id)  # a note, a chunk or an image
     return None if item is None else {k: v for k, v in item.items() if k != "vector"}
 
 
@@ -76,8 +79,9 @@ def delete(item_id: str) -> str:
 
 @mcp.tool()
 def ingest_folder(path: str, project: str = "default") -> dict:
-    """Index the Markdown, text and reStructuredText files under path, chunked by heading with
-    file and line provenance. Unchanged files are skipped; changed files are re-chunked."""
+    """Index the Markdown, text, reStructuredText, PDF and image files under path. Text is
+    chunked by heading with file, page and line provenance; images get a CLIP vector. Unchanged
+    files are skipped; changed files are re-indexed."""
     return kb().ingest_folder(path, project)
 
 

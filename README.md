@@ -5,8 +5,9 @@ A knowledge base for Claude (or any MCP client) that lives in one folder on disk
 - **Hybrid search**: vector similarity and BM25 keyword search in one query, merged with
   reciprocal rank fusion. Meaning-based questions and exact strings like `E1042` both work.
 - **Notes**: Claude can save, update and delete notes while it works.
-- **Folder ingest**: Markdown, text and reStructuredText files are chunked by heading, with
-  the file and line range kept on every chunk so answers can cite their source.
+- **Folder ingest**: Markdown, text, reStructuredText and PDF files are chunked by heading
+  (PDFs page by page), with the file, page and line range kept on every chunk so answers can
+  cite their source. Images get a CLIP vector, so a question can find a picture too.
 - **Versions**: every write creates a new version. Search the knowledge base as it was
   yesterday, or roll it back.
 
@@ -16,16 +17,21 @@ vectors), and the embedding model is small enough to run on a laptop CPU.
 ## How it fits together
 
 ```
-Claude Code ──stdio──▶ lancedb-kb-mcp ──▶ LanceDB table in ./kb-data
-                           │                 ├─ vectors (384-dim)
-                           │                 ├─ full-text index
-                           └─ bge-small      └─ version history
-                              (local model)
+Claude Code ──stdio──▶ lancedb-kb-mcp ──▶ LanceDB tables in ./kb-data
+                           │                 ├─ items: notes, text and PDF chunks
+                           │                 │    vectors (384-dim), full-text index, versions
+                           ├─ bge-small      └─ images: one row per image, CLIP vectors (512-dim)
+                           └─ CLIP (local models, loaded on first use)
 ```
 
-One table holds both notes and document chunks. Each row has the text, a title, a project, tags,
-the source file and line range, and its vector. Writes go through LanceDB's `merge_insert`, and
-the full-text index is rebuilt after each write.
+The `items` table holds notes and document chunks. Each row has the text, a title, a project,
+tags, the source file, page and line range, and its vector. Writes go through LanceDB's
+`merge_insert`, and the full-text index is rebuilt after each write.
+
+Images live in a second table, because their vectors come from a different model. CLIP puts a
+picture and a sentence describing it close together, so the question's text vector can be
+compared with image vectors directly. A search runs both, keeps images whose CLIP score is at
+least 0.28, and merges the two ranked lists by rank.
 
 ## Quick start
 
@@ -39,13 +45,19 @@ uv sync
 uv run lance-kb ingest examples/docs --project demo
 uv run lance-kb search "why is the queue backing up"
 uv run lance-kb search "E1042"
+uv run lance-kb search "what happened to the queue backlog during the outage"
 ```
 
-The first run downloads the embedding model (about 130 MB) into the Hugging Face cache. After
-that, ingesting the three sample files takes a few seconds.
+The first run downloads the text model (about 130 MB) and, because the samples include images,
+CLIP (about 580 MB) into the Hugging Face cache. After that, ingesting the six sample files
+(three Markdown files, a two-page PDF postmortem and two PNGs) takes a few seconds.
 
 The first query shares no keywords with the runbook it finds; the second is an exact error code.
-Three files are too few to show the difference between the modes. On mypy's documentation (37
+The third comes back with a PDF page, the dashboard screenshot and a runbook section, each with
+its file and page or lines.
+
+The sample files are made up for this demo. The PDF and the PNGs were rendered from HTML with a
+headless browser. Six files are too few to show the difference between the search modes. On mypy's documentation (37
 files, 662 chunks), searching for each of its 78 error codes on its own put the right section
 first 61 times with vector search, 62 with keyword search and 69 with hybrid search. Try
 `--mode vector` and `--mode text` on your own docs to see where they differ.
@@ -80,12 +92,12 @@ Any other MCP client works the same way: the command is `uv run lancedb-kb-mcp`,
 
 | Tool | What it does |
 |---|---|
-| `search(query, k, project, kind, tag, version, mode)` | Hybrid search by default; `mode` can be `vector` or `text`. Filters apply before the search, so a narrow filter still returns `k` results. `version` searches an older version. |
-| `get(item_id)` | One note or chunk with its full text and metadata. |
+| `search(query, k, project, kind, tag, version, mode)` | Hybrid search by default; `mode` can be `vector` or `text` (text mode skips images). `kind` is `note`, `chunk` or `image`. Filters apply before the search, so a narrow filter still returns `k` results. `version` searches an older version of the notes and chunks. |
+| `get(item_id)` | One note, chunk or image with its metadata (and full text for notes and chunks). |
 | `add_note(title, text, project, tags)` | Save a note and return its id. |
 | `update_note(item_id, ...)` | Change a note; it is re-embedded. |
 | `delete(item_id)` | Delete a note or chunk. It stays in the version history. |
-| `ingest_folder(path, project)` | Index a folder. Unchanged files are skipped by content hash; changed files have their chunks replaced. |
+| `ingest_folder(path, project)` | Index `.md`, `.txt`, `.rst`, `.pdf`, `.png`, `.jpg`, `.webp` and `.gif` files under a folder. Unchanged files are skipped by content hash; changed files are re-indexed. |
 | `list_versions()` | Every version with its timestamp. |
 | `restore_version(version)` | Make an older version current. This writes a new version, so nothing is lost. |
 
@@ -98,6 +110,8 @@ BM25 in text mode, cosine similarity in vector mode.
 |---|---|---|
 | `LANCE_KB_DIR` | `kb-data` | Where the LanceDB table lives. |
 | `LANCE_KB_MODEL` | `BAAI/bge-small-en-v1.5` | Any sentence-transformers model. `hash` uses a tiny bag-of-words embedder with no download, meant for tests. |
+| `LANCE_KB_IMAGE_MODEL` | `clip-ViT-B-32` | The image model; it must embed text and images into the same space. |
+| `LANCE_KB_IMAGE_MIN_SCORE` | `0.28` | Images scoring below this are left out of the results. |
 | `LANCE_KB_DEVICE` | auto | `cpu`, `cuda` or `mps`. |
 
 The model is part of your schema. Vectors from different models are not comparable, so if you
@@ -134,7 +148,12 @@ The tests use the hash embedder, so they run in about a second with no model dow
   for millions. A larger deployment would batch writes and reindex on a schedule.
 - No vector index is built. Exact search over tens of thousands of chunks is fast; past a few
   hundred thousand, add one with `table.create_index(...)`.
-- Only text files are ingested. PDFs, images and code need their own chunkers.
+- PDFs are read as text. Scanned PDFs have no text layer and come back empty; they need OCR.
+- CLIP matches what a picture looks like, not what it means. "architecture diagram of the order
+  system" finds the diagram; "which services does an order pass through" does not. Describe the
+  picture. The 0.28 cut-off was set on the two sample images (matches scored 0.31 to 0.33,
+  unrelated questions up to 0.27), so check it on your own images.
+- Code, audio and video are not ingested.
 
 ## License
 
