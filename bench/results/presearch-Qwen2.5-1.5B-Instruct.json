@@ -1,0 +1,34 @@
+{
+  "llm": "Qwen/Qwen2.5-1.5B-Instruct",
+  "device": "cpu",
+  "search": "bge-small hybrid",
+  "examples": {
+    "rewrite": {
+      "question": "0-dimensional biomaterials show inductive properties.",
+      "generated": "\"0D biomaterials and their inductive properties\""
+    },
+    "hyde": {
+      "question": "0-dimensional biomaterials show inductive properties.",
+      "generated": "0-dimensional biomaterials, such as nanoparticles and microbeads, can exhibit inductive properties when introduced into living tissues, potentially promoting cell growth and differentiation under certain conditions."
+    }
+  },
+  "none": {
+    "scifact_ndcg10": 0.7223,
+    "vidore_hit1": 0.7424,
+    "vidore_hit5": 0.9545
+  },
+  "rewrite": {
+    "scifact_ndcg10": 0.6939,
+    "vidore_hit1": 0.7424,
+    "vidore_hit5": 0.9167,
+    "ms_per_question": 1834,
+    "batch_s": 274
+  },
+  "hyde": {
+    "scifact_ndcg10": 0.7318,
+    "vidore_hit1": 0.7652,
+    "vidore_hit5": 0.9621,
+    "ms_per_question": 4117,
+    "batch_s": 585
+  }
+}

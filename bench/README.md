@@ -119,3 +119,38 @@ search alone, and is the one model that keyword search makes worse (0.775 hybrid
 ![Time per question on a CPU](results/models-cpu.svg)
 
 ![Finding a photo from a sentence](results/models-clip.svg)
+
+## A model before or after the search?
+
+Two common add-ons, measured on the same benchmarks with bge-small hybrid search as the base.
+Numbers are SciFact nDCG@10, the share of ViDoRe questions with the right PDF page first, and
+with it in the top five.
+
+**After: reranking** (`rerank.py`). A cross-encoder reads the question with each of the top 50
+candidates and reorders them. Time is per question, on the CPU, for those 50 pairs.
+
+| | SciFact | PDF page first | PDF top 5 | CPU time |
+|---|---|---|---|---|
+| no reranker | 0.723 | 74% | 95% | |
+| ms-marco-MiniLM-L6-v2 (22M) | 0.696 | 76% | 92% | 1.2 s |
+| bge-reranker-base (278M) | 0.721 | 72% | 94% | 8.2 s |
+
+Neither helps here, and both cost far more than the 12 ms search. ms-marco is trained on web
+search queries, which is a likely reason it does worse on scientific claims.
+
+**Before: a small language model** (`presearch.py`). *Rewrite* asks the model for a short
+keyword query. *HyDE* asks it for a two- or three-sentence answer and searches with the
+question plus that answer, since a made-up answer reads more like the documents.
+
+| | SciFact | PDF page first | PDF top 5 | added time |
+|---|---|---|---|---|
+| nothing | 0.722 | 74% | 95% | |
+| Qwen2.5-0.5B, rewrite | 0.670 | 71% | 93% | 81 ms (GPU) |
+| Qwen2.5-0.5B, HyDE | 0.708 | 77% | 97% | 150 ms (GPU) |
+| Qwen2.5-1.5B, rewrite | 0.694 | 74% | 92% | 1.8 s (CPU) |
+| Qwen2.5-1.5B, HyDE | 0.732 | 77% | 96% | 4.1 s (CPU) |
+
+Rewriting hurts. HyDE with the 1.5B model helps on both benchmarks, by about a point on
+SciFact and three questions on the PDF, at the cost of a model call before every search.
+The 1.5B CPU timings were taken while other jobs shared the machine, so read them as an upper
+bound.
