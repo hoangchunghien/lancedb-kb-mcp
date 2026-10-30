@@ -62,6 +62,18 @@ files, 662 chunks), searching for each of its 78 error codes on its own put the 
 first 61 times with vector search, 62 with keyword search and 69 with hybrid search. Try
 `--mode vector` and `--mode text` on your own docs to see where they differ.
 
+## How well does it work?
+
+[bench/](bench/README.md) runs three public datasets on the default models:
+
+| What | Dataset | Result |
+|---|---|---|
+| Text | BEIR SciFact, 5,183 abstracts, 300 queries | nDCG@10 0.722 hybrid, 0.713 vector, 0.676 keyword |
+| PDF pages | ViDoRe V3 computer science, 945-page textbook PDF, 132 questions | right page first 74%, in the top 5 95% |
+| Images | Flickr30k 1k test, 1,000 photos, 5,000 captions | recall@1 0.594, recall@10 0.902 |
+
+The bench README has the details, including what the 0.28 image cut-off hides and lets through.
+
 ## Use it from Claude Code
 
 This repo ships a project-scoped `.mcp.json`, so the quickest trial is to open Claude Code in this
