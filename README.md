@@ -135,3 +135,7 @@ The tests use the hash embedder, so they run in about a second with no model dow
 - No vector index is built. Exact search over tens of thousands of chunks is fast; past a few
   hundred thousand, add one with `table.create_index(...)`.
 - Only text files are ingested. PDFs, images and code need their own chunkers.
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).

@@ -3,6 +3,7 @@ name = "lancedb-kb-mcp"
 version = "0.1.0"
 description = "A knowledge base MCP server on LanceDB: hybrid search, notes, folder ingest and versions, all in one local folder."
 readme = "README.md"
+license = "Apache-2.0"
 authors = [
     { name = "Hien Hoang", email = "hoangchunghien@gmail.com" }
 ]
